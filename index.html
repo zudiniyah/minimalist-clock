@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Minimalist Clock</title>
+<title>SK. Pekan Menumbok - Examination Clock</title>
 <style>
     html, body {
         width: 100%;
@@ -14,11 +14,68 @@
     }
 
     body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
         color: #fff;
         font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .screen {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* Permanent, deliberately small school branding */
+    .branding {
+        position: absolute;
+        top: 3vh;
+        left: 4vw;
+        display: flex;
+        align-items: center;
+        gap: 1vw;
+        text-align: left;
+    }
+
+    .school-logo {
+        width: clamp(38px, 4vw, 62px);
+        height: clamp(38px, 4vw, 62px);
+        object-fit: contain;
+    }
+
+    .school-name {
+        font-size: clamp(14px, 1.6vw, 26px);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    #examInfo {
+        display: none;
+        margin-bottom: 5vh;
+    }
+
+    #paperName {
+        font-size: clamp(24px, 4vw, 64px);
+        font-weight: 600;
+        margin-bottom: 1.2vh;
+    }
+
+    #paperDuration {
+        font-size: clamp(18px, 2.3vw, 36px);
+        font-weight: 400;
     }
 
     #clock {
@@ -32,22 +89,111 @@
 </head>
 <body>
 
-<div id="clock">00:00:00</div>
+<main class="screen">
+
+    <header class="branding">
+        <img class="school-logo" src="logo.png" alt="SK. Pekan Menumbok logo">
+        <div class="school-name">SK PEKAN MENUMBOK</div>
+    </header>
+
+    <section class="content">
+        <div id="examInfo">
+            <div id="paperName"></div>
+            <div id="paperDuration"></div>
+        </div>
+
+        <div id="clock">00:00:00</div>
+    </section>
+
+</main>
 
 <script>
-function updateClock() {
-    const now = new Date();
+/*
+    Examination schedule
+    The clock ALWAYS shows the TV's local current time.
+    Exam information only appears during the specified display windows.
+*/
 
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+const schedule = [
+    {
+        date: "2026-10-06",
+        start: "08:00",
+        end: "09:35",
+        paper: "Bahasa Melayu",
+        duration: "1 jam 15 minit"
+    },
+    {
+        date: "2026-10-06",
+        start: "10:45",
+        end: "12:20",
+        paper: "Bahasa Inggeris",
+        duration: "1 jam 15 minit"
+    },
+    {
+        date: "2026-10-07",
+        start: "08:00",
+        end: "09:35",
+        paper: "Matematik SK",
+        duration: "1 jam 15 minit"
+    },
+    {
+        date: "2026-10-07",
+        start: "10:45",
+        end: "12:20",
+        paper: "Sains SK",
+        duration: "1 jam 15 minit"
+    }
+];
 
-    document.getElementById('clock').textContent =
-        `${hours}:${minutes}:${seconds}`;
+function getCurrentExam(now) {
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const date = `${year}-${month}-${day}`;
+
+    const minutesNow = now.getHours() * 60 + now.getMinutes();
+
+    for (const exam of schedule) {
+        if (exam.date !== date) continue;
+
+        const [startHour, startMinute] = exam.start.split(":").map(Number);
+        const [endHour, endMinute] = exam.end.split(":").map(Number);
+
+        const startMinutes = startHour * 60 + startMinute;
+        const endMinutes = endHour * 60 + endMinute;
+
+        if (minutesNow >= startMinutes && minutesNow < endMinutes) {
+            return exam;
+        }
+    }
+
+    return null;
 }
 
-updateClock();
-setInterval(updateClock, 1000);
+function updateDisplay() {
+    const now = new Date();
+
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    document.getElementById("clock").textContent =
+        `${hours}:${minutes}:${seconds}`;
+
+    const exam = getCurrentExam(now);
+    const examInfo = document.getElementById("examInfo");
+
+    if (exam) {
+        document.getElementById("paperName").textContent = exam.paper;
+        document.getElementById("paperDuration").textContent = exam.duration;
+        examInfo.style.display = "block";
+    } else {
+        examInfo.style.display = "none";
+    }
+}
+
+updateDisplay();
+setInterval(updateDisplay, 1000);
 </script>
 
 </body>
