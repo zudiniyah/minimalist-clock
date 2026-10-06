@@ -67,15 +67,15 @@
         margin-bottom: 5vh;
     }
 
-    #paperName {
-        font-size: clamp(24px, 4vw, 64px);
-        font-weight: 600;
-        margin-bottom: 1.2vh;
-    }
-
-    #paperDuration {
+    .exam-line {
         font-size: clamp(18px, 2.3vw, 36px);
         font-weight: 400;
+        line-height: 1.35;
+        margin: 0.3vh 0;
+    }
+
+    #paperName {
+        font-weight: 700;
     }
 
     #clock {
@@ -98,8 +98,9 @@
 
     <section class="content">
         <div id="examInfo">
-            <div id="paperName"></div>
-            <div id="paperDuration"></div>
+            <div id="paperName" class="exam-line"></div>
+            <div id="paperTime" class="exam-line"></div>
+            <div id="paperDuration" class="exam-line"></div>
         </div>
 
         <div id="clock">00:00:00</div>
@@ -117,30 +118,26 @@
 const schedule = [
     {
         date: "2026-10-06",
-        start: "08:00",
-        end: "09:35",
-        paper: "Bahasa Melayu",
-        duration: "1 jam 15 minit"
-    },
-    {
-        date: "2026-10-06",
         start: "10:45",
         end: "12:20",
-        paper: "Bahasa Inggeris",
+        paper: "Bahasa Inggeris (043)",
+        examTime: "11.00 pagi - 12.15 tengah hari",
         duration: "1 jam 15 minit"
     },
     {
         date: "2026-10-07",
         start: "08:00",
         end: "09:35",
-        paper: "Matematik SK",
+        paper: "Matematik SK (045)",
+        examTime: "8.15 pagi - 9.30 pagi",
         duration: "1 jam 15 minit"
     },
     {
         date: "2026-10-07",
         start: "10:45",
         end: "12:20",
-        paper: "Sains SK",
+        paper: "Sains SK (048)",
+        examTime: "11.00 pagi - 12.15 tengah hari",
         duration: "1 jam 15 minit"
     }
 ];
@@ -185,6 +182,7 @@ function updateDisplay() {
 
     if (exam) {
         document.getElementById("paperName").textContent = exam.paper;
+        document.getElementById("paperTime").textContent = exam.examTime;
         document.getElementById("paperDuration").textContent = exam.duration;
         examInfo.style.display = "block";
     } else {
